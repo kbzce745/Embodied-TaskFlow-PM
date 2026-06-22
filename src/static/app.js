@@ -405,13 +405,15 @@ function handleEstop(estopDetail) {
     document.getElementById("estop-overlay").style.display = "flex";
     document.getElementById("overlay-reason").textContent = estopDetail.description;
     
+    const rawData = estopDetail.raw_data || {};
+    
     // 记录触发急停时的整套时序状态用于打标
     executionHistory.push({
         node_id: currentNodeId,
-        label: estopDetail.raw_data.failed_node,
+        label: rawData.failed_node || "MANUAL_ESTOP",
         status: "ESTOP_INTERCEPTED",
-        parameters: estopDetail.raw_data.parameters,
-        sensor_data: estopDetail.raw_data.sensor_snapshot
+        parameters: rawData.parameters || {},
+        sensor_data: rawData.sensor_snapshot || getSensorSnapshot()
     });
     
     // 启用接管与坏案导出操作
@@ -427,17 +429,16 @@ function triggerTeleop(direction) {
     }
     
     const step = 8;
-    if (direction === "up") robot.y -= step;
-    else if (direction === "down") robot.y += step;
-    else if (direction === "left") robot.x -= step;
-    else if (direction === "right") robot.x += step;
+    if (direction === "up") robot.targetY -= step;
+    else if (direction === "down") robot.targetY += step;
+    else if (direction === "left") robot.targetX -= step;
+    else if (direction === "right") robot.targetX += step;
 }
 
 // 释放急停锁定
 function releaseSafetyLock() {
     document.getElementById("estop-overlay").style.display = "none";
     document.getElementById("release-btn").disabled = true;
-    document.getElementById("export-badcase-btn").disabled = true;
     
     // 机器人返回原位
     updateSystemStatus("IDLE", "安全锁定解除，系统就绪");
@@ -455,7 +456,7 @@ async function exportBadcase() {
     const badcasePayload = {
         session_id: currentSessionId,
         raw_instruction: currentInstruction,
-        execution_result: "FAILED_BY_ESTOP",
+        execution_result: systemStatus === "ESTOP_TRIGGERED" ? "FAILED_BY_ESTOP" : "EXECUTION_INCIDENT",
         failure_reason: {
             reason_type: reasonSelect.value,
             reason_text: reasonSelect.options[reasonSelect.selectedIndex].text
@@ -512,6 +513,9 @@ async function sendTaskInstruction() {
             viewport.innerHTML = "";
             viewport.appendChild(renderBehaviorTree(currentTree));
             
+            // 启用坏案标注按钮，允许PM随时进行归档
+            document.getElementById("export-badcase-btn").disabled = false;
+            
             // 组装动作队列
             extractActionQueue(currentTree);
             
@@ -519,9 +523,11 @@ async function sendTaskInstruction() {
             setTimeout(runExecutor, 1000);
         } else {
             viewport.innerHTML = `<div class="empty-state" style="color:#ef4444">规划失败：${res.status}</div>`;
+            document.getElementById("export-badcase-btn").disabled = false;
         }
     } catch (e) {
         viewport.innerHTML = `<div class="empty-state" style="color:#ef4444">网络通信故障: ${e.message}</div>`;
+        document.getElementById("export-badcase-btn").disabled = false;
     }
 }
 

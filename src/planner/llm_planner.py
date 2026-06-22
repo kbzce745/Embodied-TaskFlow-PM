@@ -4,6 +4,28 @@ import base64
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
+def _load_env():
+    """从工作区根目录加载 .env 配置文件，动态填充环境变量"""
+    try:
+        # 当前文件在 src/planner/llm_planner.py，向上三层为项目根目录
+        root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        env_path = os.path.join(root_dir, ".env")
+        if os.path.exists(env_path):
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#"):
+                        continue
+                    if "=" in line:
+                        parts = line.split("=", 1)
+                        k = parts[0].strip()
+                        v = parts[1].strip().strip("'\"")
+                        os.environ[k] = v
+    except Exception:
+        pass
+
+_load_env()
+
 # 引入 Pydantic 行为树节点数据结构定义
 class BehaviorTreeNode(BaseModel):
     node_id: str = Field(..., description="节点唯一ID")

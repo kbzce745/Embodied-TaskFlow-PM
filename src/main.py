@@ -37,7 +37,7 @@ class BadcaseLog(BaseModel):
 async def api_plan(request: PlanRequest):
     """大模型任务分解接口"""
     try:
-        # 默认实例化规划器，若无 GEMINI_API_KEY 自动降级为 Mock
+        # 默认实例化规划器，若无相关环境变量自动降级为 Mock
         planner = GeminiTaskPlanner()
         response = planner.plan_task(
             session_id=request.session_id,

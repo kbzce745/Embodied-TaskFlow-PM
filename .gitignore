@@ -17,4 +17,5 @@ Desktop.ini
 __pycache__/
 *.pyc
 .pytest_cache/
-
+# Environment variables configuration
+.env
