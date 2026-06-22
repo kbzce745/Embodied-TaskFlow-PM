@@ -374,25 +374,60 @@ async function runExecutor() {
     }
 }
 
+// 辅助函数：等待机器人到达目标位置
+async function waitForArrival() {
+    while (Math.hypot(robot.targetX - robot.x, robot.targetY - robot.y) > 5) {
+        await sleep(100);
+    }
+}
+
 // 模拟机器人 Canvas 运动控制延时
 async function simulatePhysicalAction(step) {
-    if (step.node_id === "act_pick_cup" || step.node_id === "act_pick_coffee") {
-        // 抓取物体动作：移动到桌子，抓紧爪子
-        robot.targetX = LOCATIONS.table.x;
-        robot.targetY = LOCATIONS.table.y;
-        await sleep(2000);
+    // 提取节点所有相关文本信息以进行模糊匹配（适应大模型动态输出）
+    const text = ((step.label || "") + " " + (step.node_id || "") + " " + JSON.stringify(step.parameters || {})).toLowerCase();
+    
+    // 1. 抓取动作
+    if (text.includes("pick") || text.includes("grasp") || text.includes("抓") || text.includes("拿") || text.includes("取")) {
+        // 如果当前不在桌子附近，先去桌子
+        if (Math.hypot(LOCATIONS.table.x - robot.x, LOCATIONS.table.y - robot.y) > 50) {
+            robot.targetX = LOCATIONS.table.x;
+            robot.targetY = LOCATIONS.table.y;
+            await waitForArrival();
+        }
+        await sleep(1000); // 抓取延时
         robot.carryObject = "cup";
-    } else if (step.node_id === "act_nav_kitchen") {
-        // 导航至厨房
-        robot.targetX = LOCATIONS.kitchen.x;
-        robot.targetY = LOCATIONS.kitchen.y;
-        await sleep(3000);
-    } else if (step.node_id === "act_place_sink") {
-        // 放下物体至水槽
-        await sleep(1500);
+    } 
+    // 2. 放置动作
+    else if (text.includes("place") || text.includes("drop") || text.includes("放") || text.includes("置")) {
+        // 放水槽
+        if (text.includes("sink") || text.includes("水槽") || text.includes("kitchen") || text.includes("厨房")) {
+            robot.targetX = LOCATIONS.kitchen.x;
+            robot.targetY = LOCATIONS.kitchen.y;
+            await waitForArrival();
+        }
+        await sleep(1000); // 放置延时
         robot.carryObject = null;
-    } else {
-        // 其他判断或轻微动作延迟
+    } 
+    // 3. 导航动作
+    else if (text.includes("nav") || text.includes("move") || text.includes("移动") || text.includes("前往") || text.includes("导航") || text.includes("去")) {
+        if (text.includes("kitchen") || text.includes("sink") || text.includes("厨房") || text.includes("水槽")) {
+            robot.targetX = LOCATIONS.kitchen.x;
+            robot.targetY = LOCATIONS.kitchen.y;
+            await waitForArrival();
+        } else if (text.includes("table") || text.includes("desk") || text.includes("桌") || text.includes("客厅") || text.includes("脏杯子") || text.includes("cup")) {
+            robot.targetX = LOCATIONS.table.x;
+            robot.targetY = LOCATIONS.table.y;
+            await waitForArrival();
+        } else if (text.includes("dock") || text.includes("charge") || text.includes("充") || text.includes("桩")) {
+            robot.targetX = LOCATIONS.dock.x;
+            robot.targetY = LOCATIONS.dock.y;
+            await waitForArrival();
+        } else {
+            await sleep(1000);
+        }
+    } 
+    // 4. 其他逻辑/条件检查
+    else {
         await sleep(1000);
     }
 }
