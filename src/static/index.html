@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embodied-TaskFlow 控制中心</title>
+    <!-- 引入高质感现代无衬线字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- 引入 Chart.js 用于监控数据图表绘制 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 头部导航栏 -->
+        <header class="main-header">
+            <div class="logo">
+                <span class="brand-text">Embodied-TaskFlow</span>
+                <span class="tagline">具身智能任务规划与安全评估平台</span>
+            </div>
+            <div class="status-indicator">
+                <span class="pulse-dot idle" id="system-pulse"></span>
+                <span class="status-text" id="system-status-text">系统就绪 (IDLE)</span>
+            </div>
+        </header>
+
+        <!-- 主内容区域 (三栏分屏布局) -->
+        <main class="grid-layout">
+            <!-- 左栏：Web 2D 仿真沙盒 -->
+            <section class="panel sandbox-panel">
+                <div class="panel-header">
+                    <h2>2D 仿真沙盒</h2>
+                    <span class="badge">端侧模拟 (Robot Edge)</span>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="robot-canvas" width="480" height="420"></canvas>
+                    <!-- 全局紧急红光遮罩，触发 ESTOP 时闪烁 -->
+                    <div class="estop-overlay" id="estop-overlay">
+                        <div class="alert-box">
+                            <span class="estop-title">ESTOP 紧急停止</span>
+                            <span class="estop-reason" id="overlay-reason">触发安全拦截规则</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sandbox-controls">
+                    <h3>传感器模拟注入</h3>
+                    <div class="control-grid">
+                        <div class="switch-control">
+                            <label for="temp-switch">液体温度高温 (>50°C)</label>
+                            <input type="checkbox" id="temp-switch" class="ios-switch">
+                        </div>
+                        <div class="switch-control">
+                            <label for="human-switch">人员逼近避障半径 (<0.3m)</label>
+                            <input type="checkbox" id="human-switch" class="ios-switch">
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" id="reset-scene-btn">复位仿真环境</button>
+                </div>
+            </section>
+
+            <!-- 中栏：行为树追踪器 -->
+            <section class="panel planner-panel">
+                <div class="panel-header">
+                    <h2>任务分发与规划追踪</h2>
+                    <span class="badge">云侧决策 (LLM Planner)</span>
+                </div>
+                <div class="input-area">
+                    <input type="text" id="task-input" placeholder="输入自然语言指令 (例如：把脏杯子放回水槽)" value="把脏杯子放回水槽">
+                    <button class="btn btn-primary" id="send-task-btn">下发指令</button>
+                </div>
+                <div class="bt-container">
+                    <h3>行为树状态机 (Live Tracker)</h3>
+                    <div class="tree-viewport" id="tree-viewport">
+                        <div class="empty-state">等待下发任务指令生成行为树...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 右栏：PM 评测指标看板与 HITL -->
+            <section class="panel metrics-panel">
+                <div class="panel-header">
+                    <h2>PM 评测指标看板</h2>
+                    <span class="badge">运营分析 (HITL & BI)</span>
+                </div>
+                
+                <!-- 核心北极星指标卡 -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-title">北极星指标 (MTBO)</span>
+                        <span class="metric-value" id="val-mtbo">8.5h</span>
+                        <span class="metric-change positive">↑ 较上期 +18%</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">任务成功率 (TSR)</span>
+                        <span class="metric-value" id="val-tsr">91.2%</span>
+                        <span class="metric-change positive">↑ 目标 95%</span>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="chart-container">
+                    <canvas id="mtbo-chart" height="110"></canvas>
+                </div>
+
+                <!-- 人工接管控制台 -->
+                <div class="teleop-container">
+                    <h3>人机在环 (HITL) 遥控控制台</h3>
+                    <div class="teleop-controls">
+                        <div class="joystick-pad">
+                            <button class="arrow-btn up" id="btn-teleop-up">▲</button>
+                            <div class="middle-row">
+                                <button class="arrow-btn left" id="btn-teleop-left">◀</button>
+                                <span class="pad-center">JOY</span>
+                                <button class="arrow-btn right" id="btn-teleop-right">▶</button>
+                            </div>
+                            <button class="arrow-btn down" id="btn-teleop-down">▼</button>
+                        </div>
+                        <div class="teleop-actions">
+                            <button class="btn btn-danger" id="estop-btn">手动紧急制动</button>
+                            <button class="btn btn-success" id="release-btn" disabled>释放安全锁定</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 坏案标记与导出 -->
+                <div class="badcase-section">
+                    <h3>坏案 (Badcase) 一键标注与归档</h3>
+                    <div class="badcase-form">
+                        <select id="badcase-reason">
+                            <option value="LLM_PLANNING_ERROR">大模型任务规划错误 (LLM Error)</option>
+                            <option value="SAFETY_FALSE_POSITIVE">安全策略引擎误拦截 (False Alarm)</option>
+                            <option value="TELEOP_LATENCY_EXCEEDED">人工接管网络超时 (Network Lag)</option>
+                            <option value="HARDWARE_ACTUATOR_FAULT">底层执行机构或关节故障 (Hardware)</option>
+                        </select>
+                        <button class="btn btn-warning" id="export-badcase-btn" disabled>打标并导出 JSONL</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>
