@@ -7,7 +7,7 @@
 - [x] 后端 `main.py` 和 `llm_planner.py` 集成真实的 Gemini API
 - [x] 处理大模型返回的动态 JSONL 参数和 Schema 清理
 - [x] 验证真实 Gemini 接口能否正确生成行为树（已通过单元测试）
-- [x] 修复前端沙盒的仿真模拟循环，适应大模型生成的动态行为树节点（解决沙盒不移动问题）taskflow\src\main.py` FastAPI backend server
+- [x] 修复前端沙盒的仿真模拟循环，适应大模型生成的动态行为树节点（解决沙盒不移动问题）
 - [x] **Phase 2: Static Front-end Assets**
   - [x] Create folder `D:\embodied-taskflow\src\static\`
   - [x] Create `D:\embodied-taskflow\src\static\index.html` main layout

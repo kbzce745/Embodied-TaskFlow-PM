@@ -78,11 +78,11 @@ embodied-taskflow/
 
 ---
 
-## 📸 项目运行演示 (Demonstrations)
+## 项目运行演示 (Demonstrations)
 
 ### 1. 任务规划与全自动沙盒仿真闭环
 通过大模型将用户的模糊指令（“把脏杯子放回水槽”）解析为任务行为树，驱动 2D 沙盒中机器人的物理运动（导航 -> 抓取 -> 导航 -> 放置）。
-![全自动物理仿真执行](docs/images/demo_sandbox.webp)
+![全自动物理仿真执行](docs/images/demo_task_completed.png)
 
 ### 2. 评测大屏监控与异常红灯锁定 (ESTOP)
 监控任务能耗估算与视觉置信度，并且当大模型输出具有危险边界的动作时，系统会自动拦截触发安全锁定。
