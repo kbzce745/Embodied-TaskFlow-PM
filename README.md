@@ -55,8 +55,10 @@ embodied-taskflow/
 │   ├── system_design/      # 系统架构与 API 接口说明
 │   │   ├── SYS-001-architecture-spec.md       # 系统分层与通信协议设计
 │   │   └── SYS-002-safety-rules-and-data-flywheel.md  # 安全规则与数据飞轮标注规范
-│   └── evaluation/         # 评测标准与 Benchmark 数据集说明 (规划中)
-├── src/                    # 源代码目录 (未来阶段实现)
+│   └── evaluation/         # 评测标准与 Benchmark 数据集说明 (含评测指标与坏案回流数据)
+│       ├── VAL-001-metrics-dashboard.md   # 产品指标与评测看板设计规范
+│       └── PROJECT_RETROSPECTIVE.md        # 项目整体回顾与产品审计报告 (PM 审计)
+├── src/                    # 源代码目录 (含 Web 2D 仿真沙盒与高层规划引擎后端)
 └── tests/                  # 单元测试与集成评测用例
 ```
 
@@ -97,8 +99,11 @@ embodied-taskflow/
 ## 快速开始 (Quick Start)
 
 ### 1. 阅读产品文档
-请先阅读 [PRD-001-embodied-task-planning.md](docs/prd/PRD-001-embodied-task-planning.md) 了解系统核心需求及安全机制设计。
+请先阅读 [PRD-001-embodied-task-planning.md](file:///D:/embodied-taskflow/docs/prd/PRD-001-embodied-task-planning.md) 了解系统核心需求及安全机制设计。
 
 ### 2. 阅读架构与接口协议
-请阅读 [SYS-001-architecture-spec.md](docs/system_design/SYS-001-architecture-spec.md) 了解系统分层与数据协议。  
-请阅读 [SYS-002-safety-rules-and-data-flywheel.md](docs/system_design/SYS-002-safety-rules-and-data-flywheel.md) 了解安全规则及数据飞轮的标注设计。
+请阅读 [SYS-001-architecture-spec.md](file:///D:/embodied-taskflow/docs/system_design/SYS-001-architecture-spec.md) 了解系统分层与数据协议。  
+请阅读 [SYS-002-safety-rules-and-data-flywheel.md](file:///D:/embodied-taskflow/docs/system_design/SYS-002-safety-rules-and-data-flywheel.md) 了解安全规则及数据飞轮的标注设计。
+
+### 3. 阅读项目回顾与审计报告
+请阅读 [PROJECT_RETROSPECTIVE.md](file:///D:/embodied-taskflow/docs/evaluation/PROJECT_RETROSPECTIVE.md) 了解项目的交付情况、PM 深度分析与未来动作项。
