@@ -98,4 +98,3 @@ D:\embodied-taskflow\
         ├── VAL-001-metrics-dashboard.md
         └── badcases.jsonl
 ```
-代码库内不包含任何 emoji，且已与远端跟踪分支完全同步。
