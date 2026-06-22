@@ -37,39 +37,36 @@ We have successfully completed Phase 3 of the `embodied-taskflow` project, imple
 ![安全锁定(ESTOP)红灯警报](file:///C:/Users/Lenovo/.gemini/antigravity-ide/brain/d24ab9b2-dae4-4ace-a66a-06e4e18358ae/estop_active_1782103537053.png)
 ````
 
-## 总结
-您现在拥有了一个极具专业性、界面美观且后端接入了前沿大模型的**具身智能产品评估展示平台**！您可以将它直接推送到 GitHub 上，配合已有的 PRD 和路线图，这将是一份极其硬核的 Embodied AI PM 面试作品集。
-
 ### 2. FastAPI Web Server (main.py)
-- Created [main.py](file:///D:/embodied-taskflow/src/main.py).
-- Implemented HTTP API endpoints:
-  - `POST /api/plan`: Coordinates with the `GeminiTaskPlanner` (falling back to Mock data if the resolved API key is missing).
-  - `POST /api/verify`: Ticks nodes against the `SafetyInterceptor` rules, returning `ESTOP` intercept markers if rules like `SEC-001` or `SEC-004` fail.
-  - `POST /api/badcase`: Receives badcase reports and appends them to a JSONL log file at `docs/evaluation/badcases.jsonl`.
-  - Static mount serving UI assets and landing page.
+- 创建了 [main.py](file:///D:/embodied-taskflow/src/main.py)。
+- 实现了以下 HTTP API 接口：
+  - `POST /api/plan`：与 `GeminiTaskPlanner` 协同（如果解析的 API 密钥缺失，则降级为 Mock 数据）。
+  - `POST /api/verify`：根据 `SafetyInterceptor` 规则校验节点状态，如果像 `SEC-001` 或 `SEC-004` 这样的规则触发，则返回 `ESTOP` 拦截标记。
+  - `POST /api/badcase`：接收坏案上报，并将其追加写入 `docs/evaluation/badcases.jsonl` 日志文件中。
+  - 挂载静态文件目录以提供前端资源及主页服务。
 
 ### 3. Glassmorphic Frontend Controls (static/)
-- Created [index.html](file:///D:/embodied-taskflow/src/static/index.html) setting up a clean three-column control dashboard:
-  - **Left panel**: Interactive Canvas simulator displaying robot states, laser scanner ranges, and obstacle triggers (switches to simulate human proximity and high temp).
-  - **Middle panel**: Live behavior tree tracker highlighting running, success, and failed states during ticks.
-  - **Right panel**: PM Evaluation dashboard tracking MTBO and TSR trends (via Chart.js), remote teleoperation buttons, and one-click badcase tag-and-export selectors.
-- Created [style.css](file:///D:/embodied-taskflow/src/static/style.css) containing dark glassmorphic panels, iOS-style toggles, joystick styling, and animated ESTOP warning indicators.
-- Created [app.js](file:///D:/embodied-taskflow/src/static/app.js) managing the 2D render loop, obstacle boundaries, incremental movement math, remote API polling, and local storage mappings.
+- 创建了 [index.html](file:///D:/embodied-taskflow/src/static/index.html)，搭建了一个整洁的三栏式控制仪表盘：
+  - **左侧面板**：交互式 Canvas 仿真器，展示机器人状态、激光扫描仪范围以及障碍物触发器（包含模拟人影靠近和液体高温的开关）。
+  - **中间面板**：实时行为树追踪器，在运行周期内高亮显示运行中（Running）、成功（Success）和失败（Failed）状态。
+  - **右侧面板**：PM 评估大屏，追踪平均人工干预间隔时间（MTBO）和任务成功率（TSR）趋势（使用 Chart.js），提供远程接管控制按钮以及一键坏案标记与导出选择器。
+- 创建了 [style.css](file:///D:/embodied-taskflow/src/static/style.css)，包含深色玻璃拟物化面板、iOS 风格切换开关、操纵杆样式以及动画效果的 ESTOP 紧急停止警告指示器。
+- 创建了 [app.js](file:///D:/embodied-taskflow/src/static/app.js)，管理 2D 渲染循环、障碍物边界、增量移动算法、远程 API 轮询以及本地存储映射。
 
 ### 4. Git Push Execution
-- Added standard Python cache files (`__pycache__/`, `*.pyc`, `.pytest_cache/`) to `.gitignore` to prevent tracking compile files.
-- Staged all source files, committed, and pushed the repository to GitHub.
+- 将标准的 Python 缓存文件（`__pycache__/`、`*.pyc`、`.pytest_cache/`）添加至 `.gitignore` 中以防止追踪编译文件。
+- 暂存了所有源文件，进行了本地提交，并将仓库推送到了 GitHub 远端。
 
 ---
 
-## Verification Results
+## 验证结果 (Verification Results)
 
-### Backend Server Startup
-Launched the FastAPI server locally from the repository root:
+### 后端服务器启动 (Backend Server Startup)
+在仓库根目录下在本地启动了 FastAPI 服务器：
 ```bash
 $env:PYTHONPATH="."; python src/main.py
 ```
-Output:
+输出：
 ```txt
 INFO:     Started server process [5340]
 INFO:     Waiting for application startup.
@@ -77,14 +74,14 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 ```
 
-### Frontend Operations
-Using the browser automation agent, we navigated to `http://127.0.0.1:8000` and verified:
-- Outlined maps (Charging Dock, Table, Sink) are rendered correctly on the 2D Canvas.
-- Selecting "液体高温" or "人影靠近" during task execution successfully triggers `SafetyInterceptor` endpoints, instantly freezing the robot, flashing the screen red, and showing the "ESTOP 紧急停止" HUD.
-- The manual remote override joystick works, moving the robot on-screen.
-- The badcase feedback mechanism outputs standard JSONL files in `docs/evaluation/badcases.jsonl` upon tagging.
+### 前端操作验证 (Frontend Operations)
+使用浏览器自动化代理，我们导航至 `http://127.0.0.1:8000` 并验证了以下内容：
+- 2D Canvas 上正确渲染了标注好的地图（充电桩、桌子、水槽）。
+- 在任务执行期间选择“液体高温”或“人影靠近”时，能成功触发 `SafetyInterceptor` 接口，使机器人瞬间冻结、屏幕闪红并显示“ESTOP 紧急停止”抬头显示（HUD）。
+- 手动远程接管摇杆能正常工作，在屏幕上移动机器人。
+- 坏案反馈机制在点击标记后能正确输出标准的 JSONL 文件到 `docs/evaluation/badcases.jsonl` 中。
 
-### Repository Tree
+### 仓库目录树 (Repository Tree)
 ```txt
 D:\embodied-taskflow\
 ├── .gitignore
@@ -101,4 +98,4 @@ D:\embodied-taskflow\
         ├── VAL-001-metrics-dashboard.md
         └── badcases.jsonl
 ```
-The codebase contains zero emojis and is fully synchronized with remote tracking branches.
+代码库内不包含任何 emoji，且已与远端跟踪分支完全同步。
