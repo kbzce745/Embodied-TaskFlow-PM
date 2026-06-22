@@ -136,25 +136,25 @@
 #### A. 系统分层应用架构图
 ```mermaid
 graph TB
-    subgraph 接入层 (Gateway)
+    subgraph "接入层 (Gateway)"
         ClientUI[Web 浏览器 UI]
         WSProxy[WebSocket 遥测中继]
         HTTPSrv[HTTP API Gateway]
     end
 
-    subgraph 云端业务层 (Cloud Services)
+    subgraph "云端业务层 (Cloud Services)"
         LLMPlan[LLM 任务规划引擎]
         EvalSrv[PM 指标评估与坏案收集服务]
         GeminiAPI[Gemini 1.5/2.0 API 接口]
     end
 
-    subgraph 端侧控制与仿真层 (Robot / Simulator)
+    subgraph "端侧控制与仿真层 (Robot / Simulator)"
         SafetyEng[端侧本地安全拦截引擎]
         Sandbox[2D Canvas 物理仿真沙盒]
         TeleopRecv[遥控信号接收与平滑控制]
     end
 
-    subgraph 数据层 (Data Storage)
+    subgraph "数据层 (Data Storage)"
         BadcaseLog[Badcase JSONL 本地文件]
         SessionDB[历史会话元数据库]
     end
