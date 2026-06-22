@@ -12,3 +12,9 @@ Desktop.ini
 *.njsproj
 *.sln
 *.swp
+
+# Python and test caches
+__pycache__/
+*.pyc
+.pytest_cache/
+
